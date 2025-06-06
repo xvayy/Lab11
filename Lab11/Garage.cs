@@ -4,7 +4,8 @@ namespace Lab11
 {
     public partial class Garage : Form
     {
-        private List<Vehicle> vehicles = new List<Vehicle>();
+        private Vehicle[] vehicles = new Vehicle[10]; // початковий розмір
+        private int vehicleCount = 0;
 
         public Garage()
         {
@@ -19,12 +20,12 @@ namespace Lab11
             dgvVehicles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvVehicles.MultiSelect = false;
 
-            vehicles.Add(new Car(12000, 200, 2017, "Petrol"));
-            vehicles.Add(new Plane(850000, 850, 2010, 12000, 180));
-            vehicles.Add(new Ship(400000, 70, 2005, 250, "Odesa"));
-            vehicles.Add(new Car(2000, 180, 2009, "Diesel"));
-            vehicles.Add(new Plane(550000, 550, 2016, 10000, 50));
-            vehicles.Add(new Car(19000, 220, 2025, "Electricity"));
+            AddVehicleToArray(new Car(12000, 200, 2017, "Petrol"));
+            AddVehicleToArray(new Plane(850000, 850, 2010, 12000, 180));
+            AddVehicleToArray(new Ship(400000, 70, 2005, 250, "Odesa"));
+            AddVehicleToArray(new Car(2000, 180, 2009, "Diesel"));
+            AddVehicleToArray(new Plane(550000, 550, 2016, 10000, 50));
+            AddVehicleToArray(new Car(19000, 220, 2025, "Electricity"));
 
 
             UpdateDataGrid();
@@ -47,8 +48,9 @@ namespace Lab11
             dgvVehicles.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
 
 
-            foreach (var vehicle in vehicles)
+            for (int i = 0; i < vehicleCount; i++)
             {
+                Vehicle vehicle = vehicles[i];
                 string type = vehicle.GetType().Name;
                 string details = "";
 
@@ -62,10 +64,30 @@ namespace Lab11
                 dgvVehicles.Rows.Add(type, vehicle.Price, vehicle.Speed, vehicle.Year, details);
             }
 
-            bool hasData = vehicles.Count > 0;
+            bool hasData = vehicleCount > 0;
             btnDelete.Visible = hasData;
             btnEdit.Visible = hasData;
             btnShowInfo.Visible = hasData;
+        }
+
+        private void AddVehicleToArray(Vehicle v)
+        {
+            if (vehicleCount >= vehicles.Length)
+            {
+                Vehicle[] newArray = new Vehicle[vehicles.Length * 2];
+                for (int i = 0; i < vehicles.Length; i++)
+                    newArray[i] = vehicles[i];
+                vehicles = newArray;
+            }
+
+            vehicles[vehicleCount++] = v;
+        }
+
+        private void DeleteVehicleAt(int index)
+        {
+            for (int i = index; i < vehicleCount - 1; i++)
+                vehicles[i] = vehicles[i + 1];
+            vehicleCount--;
         }
 
 
@@ -74,7 +96,7 @@ namespace Lab11
             AddVehicle add = new AddVehicle();
             if (add.ShowDialog() == DialogResult.OK && add.NewVehicle != null)
             {
-                vehicles.Add(add.NewVehicle);
+                AddVehicleToArray(add.NewVehicle);
                 UpdateDataGrid();
             }
         }
@@ -108,9 +130,9 @@ namespace Lab11
 
                 if (result == DialogResult.Yes)
                 {
-                    if (index < vehicles.Count)
+                    if (index < vehicleCount)
                     {
-                        vehicles.RemoveAt(index);
+                        DeleteVehicleAt(index);
                         UpdateDataGrid();
                     }
                 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lab11
 {
-    class Ship : Vehicle
+    class Ship : Vehicle 
     {
         public int PassengerCount { get; set; }
         public string Port { get; set; }
